@@ -6,19 +6,20 @@
 <title>Safety Clearance Headroom Calculator</title>
 
 <style>
+
 body{
     font-family: Arial, sans-serif;
-    background:#f5f5f5;
+    background:#f4f4f4;
     margin:0;
-    padding:15px;
+    padding:20px;
 }
 
 .card{
     background:white;
-    border-radius:15px;
-    padding:18px;
+    padding:20px;
     margin-bottom:20px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+    border-radius:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
 h2{
@@ -27,41 +28,48 @@ h2{
 
 input,select{
     width:100%;
-    padding:12px;
-    margin-top:8px;
-    margin-bottom:15px;
-    border-radius:10px;
-    border:2px solid #ff6b6b;
-    font-size:16px;
+    padding:15px;
+    margin-top:10px;
+    margin-bottom:20px;
+    border-radius:15px;
+    border:2px solid #ff9f9f;
+    font-size:18px;
 }
 
-/* Highlight FAIL */
-.failInput{
-    border:3px solid red !important;
+input.fail{
+    border:3px solid red;
     background:#ffe6e6;
 }
 
-.layout-img{
-    width:100%;
+.resultBox{
+    padding:18px;
     border-radius:15px;
-    margin-top:10px;
-}
-
-.result{
-    padding:20px;
-    border-radius:15px;
+    margin-bottom:12px;
+    color:white;
     font-size:18px;
     text-align:center;
+}
+
+.pass{ background:#2ecc71; }
+.fail{ background:#e74c3c; }
+
+button{
+    width:100%;
+    padding:15px;
+    font-size:20px;
+    border:none;
+    border-radius:15px;
+    background:#c0392b;
     color:white;
 }
 
-.pass{
-    background:#2ecc71;
+.layoutImg{
+    width:100%;
+    border-radius:15px;
+    margin-top:15px;
+    display:none;
 }
 
-.fail{
-    background:#e74c3c;
-}
 </style>
 </head>
 
@@ -69,171 +77,169 @@ input,select{
 
 <!-- Layout -->
 <div class="card">
+
 <h2>Elevator Layout</h2>
 
-<select id="layoutSelect" onchange="changeLayout()">
-<option value="">เลือก Layout</option>
-<option value="MR">MR</option>
-<option value="MRL">MRL</option>
+<select id="layoutSelect" onchange="showLayout()">
+<option value="">Select Layout</option>
+<option value="mr">MR</option>
+<option value="mrl">MRL</option>
 </select>
 
-<img id="layoutImage" class="layout-img" style="display:none;">
-</div>
+<img id="imgMR" class="layoutImg" src="image/layout-mr.jpeg">
+<img id="imgMRL" class="layoutImg" src="image/layout-mrl.jpeg">
 
-
-<!-- Lift Data -->
-<div class="card">
-<h2>Lift Data</h2>
-
-<label>VKN (m/s)</label>
-<select id="vkn" onchange="autoSKS()">
-<option value="">--เลือก--</option>
-<option>0.63</option>
-<option>0.80</option>
-<option>1.00</option>
-<option>1.50</option>
-<option>1.60</option>
-<option>1.75</option>
-<option>2.00</option>
-<option>2.50</option>
-<option>3.00</option>
-</select>
-
-<label>SKS (mm)</label>
-<input id="sks" readonly>
 </div>
 
 
 <!-- Buffer -->
 <div class="card">
+
 <h2>Buffer and Offset Values</h2>
 
 <label>HGP ระยะรันบายโครงเวท (mm)</label>
-<input id="hgp" type="number" oninput="calculate()">
+<input id="hgp" type="number">
 
-<label>HPHG ระยะยุบของ Buffer (mm)</label>
-<input id="hphg" type="number" oninput="calculate()">
+<label>HPHG ระยะยุบของ Buffer โครงเวท (mm)</label>
+<input id="hphg" type="number">
 
-<label>X ระยะลิฟท์จอดไม่เสมอชั้น (วัดจากซิลประตูในถึงซิลประตูนอก) (mm)</label>
-<input id="x" type="number" oninput="calculate()">
+<label>X ระยะลิฟท์จอดไม่เสมอชั้น (mm)</label>
+<input id="x" type="number">
+
 </div>
 
 
-<!-- Measured -->
+<!-- Measurement -->
 <div class="card">
+
 <h2>Measured Distances</h2>
 
-<label>A ระยะจากพื้นหลังคาลิฟต์ วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
-<input id="a" type="number" oninput="calculate()">
+<label>A ระยะจากพื้นหลังคาลิฟต์ถึงเพดานปล่อง (mm)</label>
+<input id="a" type="number">
 
-<label>B ระยะจากราวกันตก วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
-<input id="b" type="number" oninput="calculate()">
+<label>B ระยะจากราวกันตกถึงเพดานปล่อง (mm)</label>
+<input id="b" type="number">
 
-<label>D ระยะจากGuild shoeหรือบนRoller วัดถึงปลายรางลิฟต์ (mm)</label>
-<input id="d" type="number" oninput="calculate()">
+<label>D ระยะจาก Guild shoe / Roller ถึงปลายรางลิฟต์ (mm)</label>
+<input id="d" type="number">
+
 </div>
+
+<button onclick="calculate()">Calculate</button>
 
 
 <!-- Result -->
 <div class="card">
-<h2>Result</h2>
-<div id="resultBox" class="result pass">
-Waiting for input...
-</div>
-</div>
 
+<h2>Result</h2>
+
+<div id="resA" class="resultBox"></div>
+<div id="resB" class="resultBox"></div>
+<div id="resD" class="resultBox"></div>
+<div id="resAll" class="resultBox"></div>
+
+</div>
 
 
 <script>
 
-/* ---------- SKS TABLE ---------- */
-const sksTable = {
-"0.63":14,
-"0.80":23,
-"1.00":35,
-"1.50":79,
-"1.60":90,
-"1.75":108,
-"2.00":140,
-"2.50":219,
-"3.00":315
-};
+/* Layout Image */
+function showLayout(){
 
+let layout = document.getElementById("layoutSelect").value;
 
-/* ---------- Layout Image ---------- */
-function changeLayout(){
+document.getElementById("imgMR").style.display="none";
+document.getElementById("imgMRL").style.display="none";
 
-    const type = document.getElementById("layoutSelect").value;
-    const img = document.getElementById("layoutImage");
+if(layout==="mr") document.getElementById("imgMR").style.display="block";
+if(layout==="mrl") document.getElementById("imgMRL").style.display="block";
 
-    if(type==="MR"){
-        img.src="image/layout-mr.jpeg";
-        img.style.display="block";
-    }
-    else if(type==="MRL"){
-        img.src="image/layout-mrl.jpeg";
-        img.style.display="block";
-    }
-    else{
-        img.style.display="none";
-    }
 }
 
 
-/* ---------- Auto SKS ---------- */
-function autoSKS(){
-    let vkn = document.getElementById("vkn").value;
-    document.getElementById("sks").value = sksTable[vkn] || "";
-    calculate();
-}
-
-
-/* ---------- Calculation ---------- */
-function calculate(){
-
-    let A = parseFloat(document.getElementById("a").value)||0;
-    let B = parseFloat(document.getElementById("b").value)||0;
-    let D = parseFloat(document.getElementById("d").value)||0;
-
-    let reqA = 1000;
-    let reqB = 300;
-    let reqD = 100;
-
-    let passA = A >= reqA;
-    let passB = B >= reqB;
-    let passD = D >= reqD;
-
-    /* Highlight Fail */
-    highlight("a",passA);
-    highlight("b",passB);
-    highlight("d",passD);
-
-    let overall = passA && passB && passD;
-
-    let html = `
-    A : ${passA ? "PASS ✔" : "FAIL ✖"} (${A} / ${reqA} mm)<br>
-    B : ${passB ? "PASS ✔" : "FAIL ✖"} (${B} / ${reqB} mm)<br>
-    D : ${passD ? "PASS ✔" : "FAIL ✖"} (${D} / ${reqD} mm)<br><br>
-    <b>Overall : ${overall ? "PASS ✔" : "FAIL ✖"}</b>
-    `;
-
-    let box = document.getElementById("resultBox");
-    box.innerHTML = html;
-    box.className = overall ? "result pass" : "result fail";
-}
-
-
-/* ---------- Highlight Function ---------- */
+/* Highlight input */
 function highlight(id,pass){
 
-    let el = document.getElementById(id);
+let el=document.getElementById(id);
 
-    if(!pass){
-        el.classList.add("failInput");
-    }
-    else{
-        el.classList.remove("failInput");
-    }
+if(pass){
+el.classList.remove("fail");
+}else{
+el.classList.add("fail");
+}
+
+}
+
+
+/* Result box */
+function resultBox(id,pass,html){
+
+let box=document.getElementById(id);
+box.className = pass ? "resultBox pass":"resultBox fail";
+box.innerHTML = html;
+
+}
+
+
+/* Build PASS / FAIL text */
+function buildText(label,value,req){
+
+let diff = value - req;
+
+if(value >= req){
+
+return `
+${label} : ผ่าน ✔ (${value} / ${req} mm)<br>
+<span style="color:#00ff7f; font-weight:bold;">
+เหลือ : +${diff} mm
+</span>
+`;
+
+}else{
+
+return `
+${label} : ไม่ผ่าน ✖ (${value} / ${req} mm)<br>
+<span style="color:#ff3b3b; font-weight:bold;">
+ขาดไป : ${Math.abs(diff)} mm
+</span>
+`;
+
+}
+
+}
+
+
+/* Calculate */
+function calculate(){
+
+let A = parseFloat(document.getElementById("a").value)||0;
+let B = parseFloat(document.getElementById("b").value)||0;
+let D = parseFloat(document.getElementById("d").value)||0;
+
+let reqA = 1000;
+let reqB = 300;
+let reqD = 100;
+
+let passA = A>=reqA;
+let passB = B>=reqB;
+let passD = D>=reqD;
+
+let overall = passA && passB && passD;
+
+/* Highlight */
+highlight("a",passA);
+highlight("b",passB);
+highlight("d",passD);
+
+/* Result Detail */
+resultBox("resA",passA,buildText("A",A,reqA));
+resultBox("resB",passB,buildText("B",B,reqB));
+resultBox("resD",passD,buildText("D",D,reqD));
+
+/* Overall */
+resultBox("resAll",overall,
+`Overall : ${overall ? "PASS ✔":"FAIL ✖"}`);
+
 }
 
 </script>
