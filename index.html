@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elevator Clearance Calculator</title>
+<title>Safety Clearance Herdroom Calculator</title>
 
 <style>
 body{
@@ -63,15 +63,15 @@ input,select{
 
 <!-- Buffer and Offset Values (ขึ้นก่อน) -->
 <div class="card">
-<h2>Buffer and Offset Values</h2>
+<h2>HGP, Buffer stroke , Offset Values</h2>
 
-<label>HGP (mm)</label>
+<label>HGP ระยะรันบายโครงเวทm)</label>
 <input type="number">
 
-<label>HPHG (mm)</label>
+<label>HPHG ระยะยุบบัฟเฟอร์ </label>
 <input type="number">
 
-<label>X (mm)</label>
+<label>X ระยะลิฟท์จอดไม่เสมอชั้น </label>
 <input type="number">
 
 </div>
@@ -81,13 +81,13 @@ input,select{
 <div class="card">
 <h2>Measured Distances</h2>
 
-<label>A – Free vertical distance between standing area and hoistway ceiling (mm)</label>
+<label>A ระยะจากพื้นหลังคาลิฟต์วัดถึงเพดานปล่องลิฟต์หรือส่วนที่ยื่นลงมา Hook (mm)</label>
 <input type="number">
 
-<label>B – Clearance above equipment or balustrade (mm)</label>
+<label>B ระยะจากราวกันตกวัดถึงเพดานปล่องลิฟต์หรือส่วนที่ยื่นลงมา Hook (mm)</label>
 <input type="number">
 
-<label>D – Guide rail extra travel allowance (mm)</label>
+<label>D ระยะจากGuild shoeหรือRoller วัดถึงปลายรางลิฟต์</label>
 <input type="number">
 
 </div>
@@ -97,8 +97,7 @@ input,select{
 <div class="card">
 <h2>คำอธิบาย Layout</h2>
 <p>
-MR = Machine Room Elevator (ลิฟต์มีห้องเครื่อง)<br>
-MRL = Machine Room Less Elevator (ลิฟต์ไม่มีห้องเครื่อง)
+MR = Machine Room Elevator (ลิฟต์มีห้องเครื่อง)<br>HGP Room Less Elevator (ลิฟต์ไม่มีห้องเครื่อง)
 </p>
 </div>
 
@@ -119,7 +118,7 @@ function changeLayout(){
         img.style.display = "block";
     }
     else{
-        img.style.display = "none";
+        img.style.dnoneay = "none";
     }
 
 }
