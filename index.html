@@ -6,41 +6,39 @@
 <title>Safety Clearance Headroom Calculator</title>
 
 <style>
-
 body{
-    font-family: Arial;
-    background:#f3f3f3;
-    padding:12px;
-}
-
-.header{
-    background:#c0392b;
-    color:white;
+    font-family: Arial, sans-serif;
+    background:#f5f5f5;
+    margin:0;
     padding:15px;
-    text-align:center;
-    font-size:22px;
-    border-radius:12px;
-    margin-bottom:15px;
 }
 
 .card{
     background:white;
-    padding:15px;
-    margin-bottom:20px;
     border-radius:15px;
+    padding:18px;
+    margin-bottom:20px;
     box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
 
-h2{ color:#c0392b; }
+h2{
+    color:#c0392b;
+}
 
 input,select{
     width:100%;
-    padding:10px;
+    padding:12px;
     margin-top:8px;
     margin-bottom:15px;
     border-radius:10px;
     border:2px solid #ff6b6b;
     font-size:16px;
+}
+
+/* Highlight FAIL */
+.failInput{
+    border:3px solid red !important;
+    background:#ffe6e6;
 }
 
 .layout-img{
@@ -50,105 +48,123 @@ input,select{
 }
 
 .result{
-    font-size:20px;
-    font-weight:bold;
+    padding:20px;
+    border-radius:15px;
+    font-size:18px;
     text-align:center;
-    padding:15px;
-    border-radius:12px;
+    color:white;
 }
 
-.pass{ background:#2ecc71;color:white; }
-.fail{ background:#e74c3c;color:white; }
+.pass{
+    background:#2ecc71;
+}
 
+.fail{
+    background:#e74c3c;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-Safety Clearance Headroom Calculator
-</div>
-
 <!-- Layout -->
 <div class="card">
-<h2>📐 Elevator Layout</h2>
+<h2>Elevator Layout</h2>
 
 <select id="layoutSelect" onchange="changeLayout()">
-<option value="">-- เลือก --</option>
+<option value="">เลือก Layout</option>
 <option value="MR">MR</option>
 <option value="MRL">MRL</option>
 </select>
 
-<img id="layoutImage" class="layout-img" style="display:none">
+<img id="layoutImage" class="layout-img" style="display:none;">
+</div>
 
+
+<!-- Lift Data -->
+<div class="card">
+<h2>Lift Data</h2>
+
+<label>VKN (m/s)</label>
+<select id="vkn" onchange="autoSKS()">
+<option value="">--เลือก--</option>
+<option>0.63</option>
+<option>0.80</option>
+<option>1.00</option>
+<option>1.50</option>
+<option>1.60</option>
+<option>1.75</option>
+<option>2.00</option>
+<option>2.50</option>
+<option>3.00</option>
+</select>
+
+<label>SKS (mm)</label>
+<input id="sks" readonly>
 </div>
 
 
 <!-- Buffer -->
 <div class="card">
-<h2>🧱 Buffer and Offset Values</h2>
+<h2>Buffer and Offset Values</h2>
 
-<label>VKN (m/s)</label>
-<select id="vkn" onchange="autoSKS();calculate()">
-<option value="">-- Select --</option>
-<option value="0.63">0.63</option>
-<option value="0.80">0.80</option>
-<option value="1.00">1.00</option>
-<option value="1.50">1.50</option>
-<option value="1.60">1.60</option>
-<option value="1.75">1.75</option>
-<option value="2.00">2.00</option>
-<option value="2.50">2.50</option>
-<option value="3.00">3.00</option>
-</select>
+<label>HGP ระยะรันบายโครงเวท (mm)</label>
+<input id="hgp" type="number" oninput="calculate()">
 
-<label>SKS Jump (mm)</label>
-<input type="number" id="sks" readonly>
+<label>HPHG ระยะยุบของ Buffer (mm)</label>
+<input id="hphg" type="number" oninput="calculate()">
 
-<label>HGP (mm)</label>
-<input type="number" id="hgp" oninput="calculate()">
-
-<label>HPHG (mm)</label>
-<input type="number" id="hphg" oninput="calculate()">
-
-<label>X (mm)</label>
-<input type="number" id="x" oninput="calculate()">
-
+<label>X ระยะลิฟท์จอดไม่เสมอชั้น (วัดจากซิลประตูในถึงซิลประตูนอก) (mm)</label>
+<input id="x" type="number" oninput="calculate()">
 </div>
 
 
 <!-- Measured -->
 <div class="card">
-<h2>📏 Measured Distances</h2>
+<h2>Measured Distances</h2>
 
-<label>A (mm)</label>
-<input type="number" id="a" oninput="calculate()">
+<label>A ระยะจากพื้นหลังคาลิฟต์ วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
+<input id="a" type="number" oninput="calculate()">
 
-<label>B (mm)</label>
-<input type="number" id="b" oninput="calculate()">
+<label>B ระยะจากราวกันตก วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
+<input id="b" type="number" oninput="calculate()">
 
-<label>D (mm)</label>
-<input type="number" id="d" oninput="calculate()">
-
+<label>D ระยะจากGuild shoeหรือบนRoller วัดถึงปลายรางลิฟต์ (mm)</label>
+<input id="d" type="number" oninput="calculate()">
 </div>
 
 
 <!-- Result -->
 <div class="card">
-<h2>📊 Result</h2>
-<div id="resultBox" class="result">
-Waiting for input
+<h2>Result</h2>
+<div id="resultBox" class="result pass">
+Waiting for input...
 </div>
 </div>
+
 
 
 <script>
 
-/* Layout Image */
+/* ---------- SKS TABLE ---------- */
+const sksTable = {
+"0.63":14,
+"0.80":23,
+"1.00":35,
+"1.50":79,
+"1.60":90,
+"1.75":108,
+"2.00":140,
+"2.50":219,
+"3.00":315
+};
+
+
+/* ---------- Layout Image ---------- */
 function changeLayout(){
 
-    let type = document.getElementById("layoutSelect").value;
-    let img = document.getElementById("layoutImage");
+    const type = document.getElementById("layoutSelect").value;
+    const img = document.getElementById("layoutImage");
 
     if(type==="MR"){
         img.src="image/layout-mr.jpeg";
@@ -164,54 +180,60 @@ function changeLayout(){
 }
 
 
-/* ⭐ SKS TABLE (Correct Spec) */
-const sksTable = {
-"0.63":14,
-"0.80":23,
-"1.00":35,
-"1.50":79,
-"1.60":90,
-"1.75":108,
-"2.00":140,
-"2.50":219,
-"3.00":315
-};
-
-
-/* Auto SKS */
+/* ---------- Auto SKS ---------- */
 function autoSKS(){
-
     let vkn = document.getElementById("vkn").value;
-    let sks = sksTable[vkn] || "";
-
-    document.getElementById("sks").value = sks;
+    document.getElementById("sks").value = sksTable[vkn] || "";
+    calculate();
 }
 
 
-/* Calculation */
+/* ---------- Calculation ---------- */
 function calculate(){
 
     let A = parseFloat(document.getElementById("a").value)||0;
     let B = parseFloat(document.getElementById("b").value)||0;
     let D = parseFloat(document.getElementById("d").value)||0;
-    let HGP = parseFloat(document.getElementById("hgp").value)||0;
-    let HPHG = parseFloat(document.getElementById("hphg").value)||0;
-    let X = parseFloat(document.getElementById("x").value)||0;
-    let SKS = parseFloat(document.getElementById("sks").value)||0;
 
-    let clearance = A + B + D - (HGP + HPHG + X + SKS);
+    let reqA = 1000;
+    let reqB = 300;
+    let reqD = 100;
+
+    let passA = A >= reqA;
+    let passB = B >= reqB;
+    let passD = D >= reqD;
+
+    /* Highlight Fail */
+    highlight("a",passA);
+    highlight("b",passB);
+    highlight("d",passD);
+
+    let overall = passA && passB && passD;
+
+    let html = `
+    A : ${passA ? "PASS ✔" : "FAIL ✖"} (${A} / ${reqA} mm)<br>
+    B : ${passB ? "PASS ✔" : "FAIL ✖"} (${B} / ${reqB} mm)<br>
+    D : ${passD ? "PASS ✔" : "FAIL ✖"} (${D} / ${reqD} mm)<br><br>
+    <b>Overall : ${overall ? "PASS ✔" : "FAIL ✖"}</b>
+    `;
 
     let box = document.getElementById("resultBox");
+    box.innerHTML = html;
+    box.className = overall ? "result pass" : "result fail";
+}
 
-    if(clearance >= 1000){
-        box.innerHTML = "PASS ✔<br>Clearance = "+clearance.toFixed(0)+" mm";
-        box.className="result pass";
+
+/* ---------- Highlight Function ---------- */
+function highlight(id,pass){
+
+    let el = document.getElementById(id);
+
+    if(!pass){
+        el.classList.add("failInput");
     }
     else{
-        box.innerHTML = "FAIL ✖<br>Clearance = "+clearance.toFixed(0)+" mm";
-        box.className="result fail";
+        el.classList.remove("failInput");
     }
-
 }
 
 </script>
