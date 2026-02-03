@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Safety Clearance Headroom Calculator</title>
+<title>Safety Clearance Headroom Calculator ES1/ES5/ES5.0 (MR/MRL) </title>
 
 <style>
 
 body{
     font-family: Arial, sans-serif;
     background:#f4f4f4;
-    margin:0;
     padding:20px;
 }
 
@@ -22,9 +21,7 @@ body{
     box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-h2{
-    color:#c0392b;
-}
+h2{ color:#c0392b; }
 
 input,select{
     width:100%;
@@ -53,6 +50,13 @@ input.fail{
 .pass{ background:#2ecc71; }
 .fail{ background:#e74c3c; }
 
+.layoutImg{
+    width:100%;
+    border-radius:15px;
+    margin-top:15px;
+    display:none;
+}
+
 button{
     width:100%;
     padding:15px;
@@ -63,13 +67,6 @@ button{
     color:white;
 }
 
-.layoutImg{
-    width:100%;
-    border-radius:15px;
-    margin-top:15px;
-    display:none;
-}
-
 </style>
 </head>
 
@@ -78,7 +75,7 @@ button{
 <!-- Layout -->
 <div class="card">
 
-<h2>Elevator Layout</h2>
+<h2>Elevator Layout เลือก MR/MRL </h2>
 
 <select id="layoutSelect" onchange="showLayout()">
 <option value="">Select Layout</option>
@@ -88,6 +85,31 @@ button{
 
 <img id="imgMR" class="layoutImg" src="image/layout-mr.jpeg">
 <img id="imgMRL" class="layoutImg" src="image/layout-mrl.jpeg">
+
+</div>
+
+
+<!-- Lift Data -->
+<div class="card">
+
+<h2>เลือก speed VKN</h2>
+
+<label>VKN (m/s)</label>
+<select id="vkn" onchange="autoSKS()">
+<option value="">-- เลือก --</option>
+<option value="0.63">0.63</option>
+<option value="0.80">0.80</option>
+<option value="1.00">1.00</option>
+<option value="1.50">1.50</option>
+<option value="1.60">1.60</option>
+<option value="1.75">1.75</option>
+<option value="2.00">2.00</option>
+<option value="2.50">2.50</option>
+<option value="3.00">3.00</option>
+</select>
+
+<label>SKS (mm)</label>
+<input id="sks" readonly>
 
 </div>
 
@@ -112,15 +134,15 @@ button{
 <!-- Measurement -->
 <div class="card">
 
-<h2>Measured Distances</h2>
+<h2>ระยะA,B,D ที่วัดได้จากหน้างาน</h2>
 
-<label>A ระยะจากพื้นหลังคาลิฟต์ถึงเพดานปล่อง (mm)</label>
+<label>A ระยะจากพื้นหลังคาลิฟต์ วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
 <input id="a" type="number">
 
-<label>B ระยะจากราวกันตกถึงเพดานปล่อง (mm)</label>
+<label>B ระยะจากราวกันตก วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
 <input id="b" type="number">
 
-<label>D ระยะจาก Guild shoe / Roller ถึงปลายรางลิฟต์ (mm)</label>
+<label>D ระยะจาก Guild shoe หรือ Roller วัดถึงปลายรางลิฟต์ (mm)</label>
 <input id="d" type="number">
 
 </div>
@@ -131,7 +153,7 @@ button{
 <!-- Result -->
 <div class="card">
 
-<h2>Result</h2>
+<h2>ค่าที่คำนวณได้</h2>
 
 <div id="resA" class="resultBox"></div>
 <div id="resB" class="resultBox"></div>
@@ -143,10 +165,33 @@ button{
 
 <script>
 
-/* Layout Image */
+/* ---------- SKS TABLE ---------- */
+const sksTable = {
+"0.63":14,
+"0.80":23,
+"1.00":35,
+"1.50":79,
+"1.60":90,
+"1.75":108,
+"2.00":140,
+"2.50":219,
+"3.00":315
+};
+
+
+/* ---------- Auto SKS ---------- */
+function autoSKS(){
+
+let vkn=document.getElementById("vkn").value;
+document.getElementById("sks").value=sksTable[vkn]||"";
+
+}
+
+
+/* ---------- Layout Image ---------- */
 function showLayout(){
 
-let layout = document.getElementById("layoutSelect").value;
+let layout=document.getElementById("layoutSelect").value;
 
 document.getElementById("imgMR").style.display="none";
 document.getElementById("imgMRL").style.display="none";
@@ -157,7 +202,7 @@ if(layout==="mrl") document.getElementById("imgMRL").style.display="block";
 }
 
 
-/* Highlight input */
+/* ---------- Highlight ---------- */
 function highlight(id,pass){
 
 let el=document.getElementById(id);
@@ -171,26 +216,16 @@ el.classList.add("fail");
 }
 
 
-/* Result box */
-function resultBox(id,pass,html){
-
-let box=document.getElementById(id);
-box.className = pass ? "resultBox pass":"resultBox fail";
-box.innerHTML = html;
-
-}
-
-
-/* Build PASS / FAIL text */
+/* ---------- Result Text ---------- */
 function buildText(label,value,req){
 
-let diff = value - req;
+let diff=value-req;
 
-if(value >= req){
+if(value>=req){
 
 return `
 ${label} : ผ่าน ✔ (${value} / ${req} mm)<br>
-<span style="color:#00ff7f; font-weight:bold;">
+<span style="color:#00ff7f;font-weight:bold;">
 เหลือ : +${diff} mm
 </span>
 `;
@@ -199,7 +234,7 @@ ${label} : ผ่าน ✔ (${value} / ${req} mm)<br>
 
 return `
 ${label} : ไม่ผ่าน ✖ (${value} / ${req} mm)<br>
-<span style="color:#ff3b3b; font-weight:bold;">
+<span style="color:#ff3b3b;font-weight:bold;">
 ขาดไป : ${Math.abs(diff)} mm
 </span>
 `;
@@ -209,36 +244,41 @@ ${label} : ไม่ผ่าน ✖ (${value} / ${req} mm)<br>
 }
 
 
-/* Calculate */
+/* ---------- Result Box ---------- */
+function resultBox(id,pass,html){
+
+let box=document.getElementById(id);
+box.className=pass?"resultBox pass":"resultBox fail";
+box.innerHTML=html;
+
+}
+
+
+/* ---------- Calculation ---------- */
 function calculate(){
 
-let A = parseFloat(document.getElementById("a").value)||0;
-let B = parseFloat(document.getElementById("b").value)||0;
-let D = parseFloat(document.getElementById("d").value)||0;
+let A=parseFloat(document.getElementById("a").value)||0;
+let B=parseFloat(document.getElementById("b").value)||0;
+let D=parseFloat(document.getElementById("d").value)||0;
 
-let reqA = 1000;
-let reqB = 300;
-let reqD = 100;
+let reqA=1000;
+let reqB=300;
+let reqD=100;
 
-let passA = A>=reqA;
-let passB = B>=reqB;
-let passD = D>=reqD;
+let passA=A>=reqA;
+let passB=B>=reqB;
+let passD=D>=reqD;
 
-let overall = passA && passB && passD;
+let overall=passA&&passB&&passD;
 
-/* Highlight */
 highlight("a",passA);
 highlight("b",passB);
 highlight("d",passD);
 
-/* Result Detail */
 resultBox("resA",passA,buildText("A",A,reqA));
 resultBox("resB",passB,buildText("B",B,reqB));
 resultBox("resD",passD,buildText("D",D,reqD));
-
-/* Overall */
-resultBox("resAll",overall,
-`Overall : ${overall ? "PASS ✔":"FAIL ✖"}`);
+resultBox("resAll",overall,`Overall : ${overall?"ผ่าน ✔":"ไม่ผ่าน ✖"}`);
 
 }
 
