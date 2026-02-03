@@ -1,314 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Safety Clearance Headroom Calculator</title>
+<title>Elevator Clearance Calculator</title>
 
 <style>
-
 body{
-font-family: Arial, sans-serif;
-background:#f3f4f6;
-margin:0;
-}
-
-header{
-background:#d32f2f;
-color:white;
-padding:15px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-}
-
-.container{
-padding:15px;
+    font-family: Arial, sans-serif;
+    background:#f5f5f5;
+    margin:0;
+    padding:10px;
 }
 
 .card{
-background:white;
-border-radius:14px;
-padding:15px;
-margin-bottom:15px;
-box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    background:white;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
 
-.card h3{
-margin-top:0;
-color:#d32f2f;
-}
-
-.desc{
-font-size:14px;
-color:#444;
-line-height:1.5;
-margin-top:5px;
-}
-
-label{
-font-weight:bold;
-display:block;
-margin-top:12px;
+h2{
+    color:#c0392b;
 }
 
 input,select{
-width:100%;
-padding:12px;
-font-size:20px;
-border-radius:8px;
-border:2px solid #ff5252;
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    margin-bottom:15px;
+    border-radius:10px;
+    border:2px solid #ff6b6b;
+    font-size:16px;
 }
 
 .layout-img{
-width:100%;
-border-radius:10px;
-margin-top:10px;
+    width:100%;
+    border-radius:15px;
+    margin-top:10px;
 }
-
-.result{
-font-size:22px;
-margin-top:10px;
-font-weight:bold;
-}
-
-.pass{ color:green; }
-.fail{ color:red; }
-
 </style>
 </head>
 
 <body>
 
-<header>
-Safety Clearance Headroom Calculator
-</header>
-
-<div class="container">
-
-<!-- Layout -->
+<!-- Elevator Layout -->
 <div class="card">
+<h2>Elevator Layout</h2>
 
-<h3>📐 Elevator Layout</h3>
-
-<div class="desc">
-Select elevator type to display the layout diagram.  
-The diagram illustrates safety clearance areas defined by EN81 standards.  
-Dimension A represents the vertical free space between the car roof standing area and hoistway ceiling.  
-Dimension B represents the clearance above balustrade or equipment installed on the car roof.  
-Dimension D represents guide rail allowance for additional guided travel.
-</div>
-
-<label>Elevator Type</label>
+<label>เลือกประเภทลิฟต์</label>
 <select id="layoutSelect" onchange="changeLayout()">
-<option value="mr">Machine Room (MR)</option>
-<option value="mrl">Machine Room Less (MRL)</option>
+<option value="">-- เลือก --</option>
+<option value="MR">MR</option>
+<option value="MRL">MRL</option>
 </select>
 
-<img id="layoutImg" class="layout-img" src="image/layout-mr.jpg">
+<img id="layoutImage" class="layout-img" style="display:none;">
 
 </div>
 
-<!-- Elevator Info -->
+
+<!-- Buffer and Offset Values (ขึ้นก่อน) -->
 <div class="card">
-
-<h3>🚀 Elevator Parameters</h3>
-
-<div class="desc">
-VKN is the rated elevator speed.  
-SKS represents the car jump distance which is calculated according to EN81 formula or standard reference table.
-</div>
-
-<label>Rated Speed VKN (m/s)</label>
-<select id="VKN">
-<option value="">Select Speed</option>
-<option value="0.63">0.63</option>
-<option value="0.80">0.80</option>
-<option value="1.00">1.00</option>
-<option value="1.50">1.50</option>
-<option value="1.60">1.60</option>
-<option value="1.75">1.75</option>
-<option value="2.00">2.00</option>
-<option value="2.50">2.50</option>
-<option value="3.00">3.00</option>
-</select>
-
-<label>SKS Jump Distance (mm)</label>
-<input type="number" id="SKS">
-
-</div>
-
-<!-- Measured -->
-<div class="card">
-
-<h3>📏 Measured Distances</h3>
-
-<div class="desc">
-Enter measured safety distances from actual site measurement.  
-These values are used to verify compliance with EN81 headroom clearance requirements.
-</div>
-
-<label>A – Free vertical distance between standing area and hoistway ceiling (mm)</label>
-<input type="number" id="A">
-
-<label>B – Clearance above equipment or balustrade (mm)</label>
-<input type="number" id="B">
-
-<label>D – Guide rail extra travel allowance (mm)</label>
-<input type="number" id="D">
-
-</div>
-
-<!-- Buffer -->
-<div class="card">
-
-<h3>🧱 Buffer and Offset Values</h3>
-
-<div class="desc">
-HGP = Distance between counterweight buffer and impact plate  
-HPHG = Counterweight buffer stroke  
-X = Car offset below top landing
-</div>
+<h2>Buffer and Offset Values</h2>
 
 <label>HGP (mm)</label>
-<input type="number" id="HGP">
+<input type="number">
 
 <label>HPHG (mm)</label>
-<input type="number" id="HPHG">
+<input type="number">
 
-<label>X Offset (mm)</label>
-<input type="number" id="X">
+<label>X (mm)</label>
+<input type="number">
 
 </div>
 
-<!-- Result -->
+
+<!-- Measured Distances -->
 <div class="card">
+<h2>Measured Distances</h2>
 
-<h3>📊 Calculation Result</h3>
+<label>A – Free vertical distance between standing area and hoistway ceiling (mm)</label>
+<input type="number">
 
-<div class="result">Total Y = <span id="Y">0</span> mm</div>
+<label>B – Clearance above equipment or balustrade (mm)</label>
+<input type="number">
 
-<div class="result">
-A − Y = <span id="AY">0</span> mm
-<span id="AYstatus"></span>
-</div>
-
-<div class="result">
-B − Y = <span id="BY">0</span> mm
-<span id="BYstatus"></span>
-</div>
-
-<div class="result">
-D − Y = <span id="DY">0</span> mm
-<span id="DYstatus"></span>
-</div>
+<label>D – Guide rail extra travel allowance (mm)</label>
+<input type="number">
 
 </div>
 
+
+<!-- Elevator Layout Description (ย้ายไปล่างสุด) -->
+<div class="card">
+<h2>คำอธิบาย Layout</h2>
+<p>
+MR = Machine Room Elevator (ลิฟต์มีห้องเครื่อง)<br>
+MRL = Machine Room Less Elevator (ลิฟต์ไม่มีห้องเครื่อง)
+</p>
 </div>
+
+
 
 <script>
-
-/* เปลี่ยน Layout */
 function changeLayout(){
 
-let type = document.getElementById("layoutSelect").value;
-let img = document.getElementById("layoutImg");
+    const type = document.getElementById("layoutSelect").value;
+    const img = document.getElementById("layoutImage");
 
-if(type === "mr"){
-img.src = "image/layout-mr.jpg";
-}
-
-if(type === "mrl"){
-img.src = "image/layout-mrl.jpg";
-}
-
-}
-
-/* ตาราง SKS */
-const sksTable = {
-"0.63":14,
-"0.80":23,
-"1.00":35,
-"1.50":79,
-"1.60":90,
-"1.75":108,
-"2.00":140,
-"2.50":219,
-"3.00":315
-};
-
-/* Auto SKS Fix */
-document.getElementById("VKN").addEventListener("change", function(){
-
-let v = this.value;
-
-if(sksTable[v] !== undefined){
-document.getElementById("SKS").value = sksTable[v];
-}
-
-calculate();
-
-});
-
-/* Calculation */
-function calculate(){
-
-let A = getVal("A");
-let B = getVal("B");
-let D = getVal("D");
-let SKS = getVal("SKS");
-let HGP = getVal("HGP");
-let HPHG = getVal("HPHG");
-let X = getVal("X");
-
-let Y = SKS + HGP + HPHG + X;
-
-let AY = A - Y;
-let BY = B - Y;
-let DY = D - Y;
-
-setText("Y",Y);
-setText("AY",AY);
-setText("BY",BY);
-setText("DY",DY);
-
-setStatus("AYstatus",AY,1000);
-setStatus("BYstatus",BY,300);
-setStatus("DYstatus",DY,100);
+    if(type === "MR"){
+        img.src = "image/layout-mr.jpeg";
+        img.style.display = "block";
+    }
+    else if(type === "MRL"){
+        img.src = "image/layout-mrl.jpeg";
+        img.style.display = "block";
+    }
+    else{
+        img.style.display = "none";
+    }
 
 }
-
-function getVal(id){
-return Number(document.getElementById(id).value) || 0;
-}
-
-function setText(id,val){
-document.getElementById(id).innerText = val;
-}
-
-function setStatus(id,val,limit){
-
-let el = document.getElementById(id);
-
-if(val >= limit){
-el.innerHTML = " ✔ PASS";
-el.className = "pass";
-}else{
-el.innerHTML = " ✖ FAIL";
-el.className = "fail";
-}
-
-}
-
-/* realtime */
-document.querySelectorAll("input").forEach(input=>{
-input.addEventListener("input",calculate);
-});
-
-window.onload = changeLayout;
-
 </script>
 
 </body>
