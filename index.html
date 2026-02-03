@@ -111,19 +111,16 @@
     </div>
 
     <div class="card">
-        <h2>ใส่ค่าHGP HPHG X </h2>
-        <label>HGP =ระยะรันบายโครงเวท (mm)</label>
-        <input id="hgp" type="number" placeholder="ดูจากแบบติดตั้งตารางระบุHGP เช่น 65-85mm" oninput="calculate()">
+        <h2>ใส่ค่า Buffer HGP,HPHG (mm) </h2>
+        <label>HGP =ระยะรันบายโครงเวท</label>
+        <input id="hgp" type="number" placeholder="ดูจากแบบติดตั้งในตารางระบุHGP" oninput="calculate()">
 
         <label>HPHG =ระยะยุบของบัฟเฟอร์โครงเวท (mm)</label>
-        <input id="hphg" type="number" placeholder="ดูจากแบบติดตั้งตารางระบุHPHG" oninput="calculate()">
-
-        <label>X =ระยะลิฟต์จอดต่ำกว่าชั้นบนสุด วัดระยะต่างระดับจากซิลประตูในถึงซิลประตูนอก (mm)</label>
-        <input id="x" type="number" placeholder="ค่าไม่เท่ากับ0ลิฟต์ต้องไม่ Normal เสมอชั้น" oninput="calculate()">
+        <input id="hphg" type="number" placeholder="ดูจากแบบติดตั้งในตารางระบุHPHG" oninput="calculate()">
     </div>
 
 <div class="card">
-        <h2>ประเภทของลิฟต์</h2>
+        <h2>ประเภทของลิฟต์ MR/MRL</h2>
         <select id="layoutSelect" onchange="showLayout()">
             <option value="">--เลือก MR/MRL--</option>
             <option value="mr">MR Elevator (มีห้องเครื่อง)</option>
@@ -133,11 +130,13 @@
 <img id="imgMRL" class="layoutImg" src="image/layout-mrl.jpeg" alt="MRL Layout">
     </div>
     <div class="card">
-        <h2>วัดระยะA B D จากรูปที่แสดงด้านบน </h2>
-        <label>A =ระยะจากพื้นหลังคาลิฟต์ วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
+        <h2>วัดระยะ X A B D จากรูปที่แสดงด้านบน (รูปซูมดูได้) </h2>
+<label>X =ระยะลิฟต์จอดต่ำกว่าชั้นบนสุด วัดระยะต่างระดับจากซิลประตูในถึงซิลประตูนอก (mm)</label>
+        <input id="x" type="number" placeholder="ค่าไม่เท่ากับ0ลิฟต์ไม่Normalเสมอชั้น" oninput="calculate()">
+        <label>A =ระยะจากพื้นหลังคาลิฟต์ วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุคที่จะชนหลังคา (mm)</label>
         <input id="a" type="number" oninput="calculate()">
 
-        <label>B =ระยะจากราวกันตก วัดถึงบริเวณที่ราวกันตกจะชน (เพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค) (mm)</label>
+        <label>B =ระยะจากราวกันตก วัดถึงบริเวณที่ราวกันตกจะขึ้นไปชน (เพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค) (mm)</label>
         <input id="b" type="number" oninput="calculate()">
 
         <label>D ระยะจาก Guide shoe หรือ Roller วัดถึงปลายรางลิฟต์(mm)</label>
