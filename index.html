@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบคำนวณ Safety Distance EN81</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f2f2f2;
+    margin:0;
+    padding:15px;
+}
+
+h1{
+    text-align:center;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+}
+
+label{
+    font-weight:bold;
+    margin-top:10px;
+    display:block;
+}
+
+input,select{
+    width:100%;
+    font-size:22px;
+    padding:10px;
+    margin-top:5px;
+    border-radius:8px;
+    border:2px solid #ff4d4d;
+}
+
+.result{
+    font-size:22px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.pass{ color:green; }
+.fail{ color:red; }
+
+.layout-img{
+    width:100%;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>ระบบคำนวณระยะ Safety EN81</h1>
+
+<!-- Layout -->
+<div class="card">
+<h3>📐 Layout ตำแหน่งการวัด</h3>
+
+<img class="layout-img" 
+src="https://i.imgur.com/V2yP7YF.png">
+
+<p>
+A = ระยะพื้นที่ยืนบนหลังคาลิฟต์ถึงเพดาน<br>
+B = ระยะบนราวกันตกถึงเพดาน<br>
+D = ระยะระยะเผื่อการเคลื่อนที่ Guide rail<br>
+X = ระยะ Offset รถลิฟต์
+</p>
+
+</div>
+
+<!-- Measured -->
+<div class="card">
+
+<h3>📏 ค่าที่วัดได้</h3>
+
+<label>ระยะ A (mm)</label>
+<input type="number" id="A">
+
+<label>ระยะ B (mm)</label>
+<input type="number" id="B">
+
+<label>ระยะ D (mm)</label>
+<input type="number" id="D">
+
+</div>
+
+<!-- SKS -->
+<div class="card">
+
+<h3>🚀 ค่า Jump Distance (SKS)</h3>
+
+<label>เลือกความเร็วลิฟต์ VKN (m/s)</label>
+<select id="VKN" onchange="autoSKS()">
+<option value="">-- เลือก --</option>
+<option value="0.63">0.63</option>
+<option value="0.80">0.80</option>
+<option value="1.00">1.00</option>
+<option value="1.50">1.50</option>
+<option value="1.60">1.60</option>
+<option value="1.75">1.75</option>
+<option value="2.00">2.00</option>
+<option value="2.50">2.50</option>
+<option value="3.00">3.00</option>
+</select>
+
+<label>ค่า SKS (mm)</label>
+<input type="number" id="SKS">
+
+</div>
+
+<!-- Buffer -->
+<div class="card">
+
+<h3>🧱 Buffer / Stroke</h3>
+
+<label>HGP (mm)</label>
+<input type="number" id="HGP">
+
+<label>HPHG (mm)</label>
+<input type="number" id="HPHG">
+
+<label>X (mm)</label>
+<input type="number" id="X">
+
+</div>
+
+<!-- Result -->
+<div class="card">
+
+<h3>📊 ผลการคำนวณ</h3>
+
+<div class="result">Total Y = <span id="Y">0</span> mm</div>
+
+<div class="result">
+A - Y = <span id="AY">0</span> mm
+<span id="AYstatus"></span>
+</div>
+
+<div class="result">
+B - Y = <span id="BY">0</span> mm
+<span id="BYstatus"></span>
+</div>
+
+<div class="result">
+D - Y = <span id="DY">0</span> mm
+<span id="DYstatus"></span>
+</div>
+
+</div>
+
+<script>
+
+// ตาราง SKS ตาม EN81
+const sksTable = {
+    0.63:14,
+    0.80:23,
+    1.00:35,
+    1.50:79,
+    1.60:90,
+    1.75:108,
+    2.00:140,
+    2.50:219,
+    3.00:315
+};
+
+function autoSKS(){
+
+    let v = document.getElementById("VKN").value;
+
+    if(sksTable[v]){
+        document.getElementById("SKS").value = sksTable[v];
+    }
+
+    calculate();
+}
+
+function calculate(){
+
+    let A = Number(document.getElementById("A").value);
+    let B = Number(document.getElementById("B").value);
+    let D = Number(document.getElementById("D").value);
+
+    let SKS = Number(document.getElementById("SKS").value);
+    let HGP = Number(document.getElementById("HGP").value);
+    let HPHG = Number(document.getElementById("HPHG").value);
+    let X = Number(document.getElementById("X").value);
+
+    let Y = SKS + HGP + HPHG + X;
+
+    let AY = A - Y;
+    let BY = B - Y;
+    let DY = D - Y;
+
+    document.getElementById("Y").innerText = Y;
+    document.getElementById("AY").innerText = AY;
+    document.getElementById("BY").innerText = BY;
+    document.getElementById("DY").innerText = DY;
+
+    setStatus("AYstatus",AY,1000);
+    setStatus("BYstatus",BY,300);
+    setStatus("DYstatus",DY,100);
+}
+
+function setStatus(id,val,limit){
+
+    let el = document.getElementById(id);
+
+    if(val >= limit){
+        el.innerHTML="✔ ผ่าน";
+        el.className="pass";
+    }else{
+        el.innerHTML="✖ ไม่ผ่าน";
+        el.className="fail";
+    }
+}
+
+document.querySelectorAll("input").forEach(i=>{
+    i.addEventListener("input",calculate);
+});
+
+</script>
+
+</body>
+</html>
