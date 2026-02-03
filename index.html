@@ -87,18 +87,10 @@
 </head>
 
 <body>
-
-    <div class="card">
-        <h2>ประเภทของลิฟต์</h2>
-        <select id="layoutSelect" onchange="showLayout()">
-            <option value="">--เลือก MR/MRL--</option>
-            <option value="mr">MR Elevator (มีห้องเครื่อง)</option>
-            <option value="mrl">MRL Elevator (ไม่มีห้องเครื่อง)</option>
-        </select>
-        <img id="imgMR" class="layoutImg" src="image/layout-mr.jpeg" alt="MR Layout">
-<img id="imgMRL" class="layoutImg" src="image/layout-mrl.jpeg" alt="MRL Layout">
-    </div>
-
+<h1 style="text-align: center; color: #d32f2f; margin-top: 20px;">
+    Safety Clearance Headroom Calculator <br>
+    <small style="color: #666; font-size: 1rem;">(ES1 / ES5.0 / ES5 Rel. 02 EN 81-1)</small>
+</h1>
     <div class="card">
         <h2>เลือก VKN เพื่อหาค่า SKS jump </h2>
         <label>VKN (m/s)</label>
@@ -130,6 +122,16 @@
         <input id="x" type="number" placeholder="ค่าไม่เท่ากับ0ลิฟต์ต้องไม่ Normal เสมอชั้น" oninput="calculate()">
     </div>
 
+<div class="card">
+        <h2>ประเภทของลิฟต์</h2>
+        <select id="layoutSelect" onchange="showLayout()">
+            <option value="">--เลือก MR/MRL--</option>
+            <option value="mr">MR Elevator (มีห้องเครื่อง)</option>
+            <option value="mrl">MRL Elevator (ไม่มีห้องเครื่อง)</option>
+        </select>
+        <img id="imgMR" class="layoutImg" src="image/layout-mr.jpeg" alt="MR Layout">
+<img id="imgMRL" class="layoutImg" src="image/layout-mrl.jpeg" alt="MRL Layout">
+    </div>
     <div class="card">
         <h2>วัดระยะA B D จากรูปที่แสดงด้านบน </h2>
         <label>A =ระยะจากพื้นหลังคาลิฟต์ วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
