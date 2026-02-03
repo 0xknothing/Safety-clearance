@@ -1,261 +1,223 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Safety Clearance Headroom Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Clearance Headroom Calculator MR/MRL (ES1/ES5/ES5.0)</title>
 
-<style>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-body{
-font-family: Arial, sans-serif;
-background:#f4f4f4;
-padding:20px;
-}
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
 
-.card{
-background:white;
-padding:20px;
-margin-bottom:20px;
-border-radius:20px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
-}
+        h2 { color: #d32f2f; margin-top: 0; font-size: 1.4rem; }
 
-h2{ color:#c0392b; }
+        label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
 
-input,select{
-width:100%;
-padding:15px;
-margin-top:10px;
-margin-bottom:20px;
-border-radius:15px;
-border:2px solid #ff9f9f;
-font-size:18px;
-}
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
 
-input.fail{
-border:3px solid red;
-background:#ffe6e6;
-}
+        input:focus { border-color: #ff9f9f; outline: none; box-shadow: 0 0 5px rgba(255,159,159,0.5); }
 
-.resultBox{
-padding:18px;
-border-radius:15px;
-margin-bottom:12px;
-color:white;
-font-size:18px;
-text-align:center;
-}
+        /* การแจ้งเตือนเมื่อไม่ผ่าน */
+        input.fail {
+            border: 2px solid #e74c3c;
+            background: #fff5f5;
+        }
 
-.pass{ background:#2ecc71; }
-.fail{ background:#e74c3c; }
+        .resultBox {
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 12px;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            line-height: 1.5;
+        }
 
-.layoutImg{
-width:100%;
-border-radius:15px;
-margin-top:15px;
-display:none;
-}
+        .pass { background: #2ecc71; } /* สีเขียวตามรูป */
+        .fail { background: #e74c3c; } /* สีแดงตามรูป */
 
-.green{color:#00ff7f;font-weight:bold;}
-.red{color:#ff3b3b;font-weight:bold;}
+        /* ปรับแก้สีตัวอักษร "ขาดไป" เป็นสีขาวตามโจทย์ */
+        .green-text { color: #aaffaa; font-weight: bold; }
+        .white-text { color: #ffffff; font-weight: bold; opacity: 0.9; }
 
-</style>
+        .layoutImg {
+            width: 100%;
+            border-radius: 15px;
+            margin-top: 15px;
+            display: none;
+            border: 1px solid #eee;
+        }
+
+        #formula {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #333;
+            border-left: 5px solid #d32f2f;
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- Layout -->
-<div class="card">
+    <div class="card">
+        <h2>Elevator Layout</h2>
+        <select id="layoutSelect" onchange="showLayout()">
+            <option value="">-- Select Layout --</option>
+            <option value="mr">MR Elevator (มีห้องเครื่อง)</option>
+            <option value="mrl">MRL Elevator (ไม่มีห้องเครื่อง)</option>
+        </select>
+        <img id="imgMR" class="layoutImg" src="layout-mr.jpg" alt="MR Layout">
+        <img id="imgMRL" class="layoutImg" src="layout-mrl.jpg" alt="MRL Layout">
+    </div>
 
-<h2>Elevator Layout เลือก MR/MRL</h2>
+    <div class="card">
+        <h2>1. Speed & SKS</h2>
+        <label>VKN (m/s)</label>
+        <select id="vkn">
+            <option value="">-- เลือกความเร็ว --</option>
+            <option value="0.63">0.63</option>
+            <option value="0.80">0.80</option>
+            <option value="1.00">1.00</option>
+            <option value="1.50">1.50</option>
+            <option value="1.60">1.60</option>
+            <option value="1.75">1.75</option>
+            <option value="2.00">2.00</option>
+            <option value="2.50">2.50</option>
+            <option value="3.00">3.00</option>
+        </select>
+        <label>SKS (mm) - ระยะกระโดด</label>
+        <input id="sks" readonly placeholder="คำนวณอัตโนมัติ">
+    </div>
 
-<select id="layoutSelect" onchange="showLayout()">
-<option value="">Select Layout</option>
-<option value="mr">MR</option>
-<option value="mrl">MRL</option>
-</select>
+    <div class="card">
+        <h2>2. Buffer & Offset (Y)</h2>
+        <label>HGP =ระยะรันบายโครงเวท (mm)</label>
+        <input id="hgp" type="number" placeholder="เช่น 65" oninput="calculate()">
 
-<img id="imgMR" class="layoutImg" src="image/layout-mr.jpeg">
-<img id="imgMRL" class="layoutImg" src="image/layout-mrl.jpeg">
+        <label>HPHG =ระยะยุบของบัฟเฟอร์โครงเวท (mm)</label>
+        <input id="hphg" type="number" placeholder="เช่น 72" oninput="calculate()">
 
-</div>
+        <label>X =ระยะลิฟต์จอดต่ำกว่าชั้นบนสุด วัดระยะต่างระดับจากซิลประตูในถึงซิลประตูนอก (mm)</label>
+        <input id="x" type="number" placeholder="เช่น 125" oninput="calculate()">
+    </div>
 
-<!-- Speed -->
-<div class="card">
+    <div class="card">
+        <h2>3. Measured Distances</h2>
+        <label>A =ระยะจากพื้นหลังคาลิฟต์ วัดถึงเพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค (mm)</label>
+        <input id="a" type="number" oninput="calculate()">
 
-<h2>Lift Speed</h2>
+        <label>B =ระยะจากราวกันตก วัดถึงบริเวณที่ราวกันตกจะชน (เพดานปล่องหรือส่วนที่ยื่นลงมาหรือฮุค) (mm)</label>
+        <input id="b" type="number" oninput="calculate()">
 
-<label>VKN (m/s)</label>
-<select id="vkn">
-<option value="">-- เลือก --</option>
-<option value="0.63">0.63</option>
-<option value="0.80">0.80</option>
-<option value="1.00">1.00</option>
-<option value="1.50">1.50</option>
-<option value="1.60">1.60</option>
-<option value="1.75">1.75</option>
-<option value="2.00">2.00</option>
-<option value="2.50">2.50</option>
-<option value="3.00">3.00</option>
-</select>
+        <label>D ระยะจาก Guide shoe หรือ Roller วัดถึงปลายรางลิฟต์(mm)</label>
+        <input id="d" type="number" oninput="calculate()">
+    </div>
 
-<label>SKS (mm)</label>
-<input id="sks" readonly>
+    <div class="card">
+        <h2>Result</h2>
+        <div id="resA"></div>
+        <div id="resB"></div>
+        <div id="resD"></div>
+        <div id="resAll"></div>
+        <div id="formula"></div>
+    </div>
 
-</div>
+    <script>
+        const sksTable = {
+            "0.63": 14, "0.80": 23, "1.00": 35, "1.50": 79, "1.60": 90,
+            "1.75": 108, "2.00": 140, "2.50": 219, "3.00": 315
+        };
 
-<!-- Buffer -->
-<div class="card">
+        function showLayout() {
+            const layout = document.getElementById("layoutSelect").value;
+            document.getElementById("imgMR").style.display = (layout === "mr") ? "block" : "none";
+            document.getElementById("imgMRL").style.display = (layout === "mrl") ? "block" : "none";
+        }
 
-<h2>Buffer and Offset Values</h2>
+        function calculate() {
+            const vknValue = document.getElementById("vkn").value;
+            const SKS = sksTable[vknValue] || 0;
+            document.getElementById("sks").value = SKS;
 
-<label>HGP ระยะรันบายโครงเวท (mm)</label>
-<input id="hgp" type="number">
+            const HGP = parseFloat(document.getElementById("hgp").value) || 0;
+            const HPHG = parseFloat(document.getElementById("hphg").value) || 0;
+            const X = parseFloat(document.getElementById("x").value) || 0;
 
-<label>HPHG ระยะยุบของ Buffer โครงเวท (mm)</label>
-<input id="hphg" type="number">
+            const A = parseFloat(document.getElementById("a").value) || 0;
+            const B = parseFloat(document.getElementById("b").value) || 0;
+            const D = parseFloat(document.getElementById("d").value) || 0;
 
-<label>X ระยะลิฟท์จอดไม่เสมอชั้น (mm)</label>
-<input id="x" type="number">
+            // สูตรคำนวณค่า Y
+            const Y = SKS + HGP + HPHG + X;
 
-</div>
+            const Ay = A - Y;
+            const By = B - Y;
+            const Dy = D - Y;
 
-<!-- Measurement -->
-<div class="card">
+            updateResult("resA", Ay, 1000, "A-Y");
+            updateResult("resB", By, 300, "B-Y");
+            updateResult("resD", Dy, 100, "D-Y");
 
-<h2>Measured Distances</h2>
+            const overall = Ay >= 1000 && By >= 300 && Dy >= 100;
+            const resAll = document.getElementById("resAll");
+            resAll.className = overall ? "resultBox pass" : "resultBox fail";
+            resAll.innerHTML = `Overall : ${overall ? "ผ่าน ✔" : "ไม่ผ่าน ✖"}`;
 
-<label>A ระยะจากพื้นหลังคาลิฟต์ ถึงเพดานปล่อง (mm)</label>
-<input id="a" type="number">
+            document.getElementById("formula").innerHTML = 
+                `<strong>สูตร:</strong> Y = SKS + HGP + HPHG + X<br>` +
+                `Y = ${SKS} + ${HGP} + ${HPHG} + ${X} = <strong>${Y} mm</strong>`;
+            
+            // Highlight ช่องที่กรอกข้อมูล
+            document.getElementById("a").className = Ay >= 1000 ? "" : "fail";
+            document.getElementById("b").className = By >= 300 ? "" : "fail";
+            document.getElementById("d").className = Dy >= 100 ? "" : "fail";
+        }
 
-<label>B ระยะจากราวกันตก ถึงเพดานปล่อง (mm)</label>
-<input id="b" type="number">
+        function updateResult(id, val, limit, label) {
+            const el = document.getElementById(id);
+            const isPass = val >= limit;
+            const diff = val - limit;
+            
+            el.className = isPass ? "resultBox pass" : "resultBox fail";
+            
+            if (isPass) {
+                el.innerHTML = `${label} : ผ่าน ✔ (${val} / ${limit} mm)<br><span class="green-text">เหลือ : +${diff} mm</span>`;
+            } else {
+                // ปรับสีตัวอักษรส่วนที่ขาดไปเป็นสีขาว (white-text) ตามคำขอ
+                el.innerHTML = `${label} : ไม่ผ่าน ✖ (${val} / ${limit} mm)<br><span class="white-text">ขาดไป : ${Math.abs(diff)} mm</span>`;
+            }
+        }
 
-<label>D ระยะจาก Guild shoe ถึงปลายรางลิฟต์ (mm)</label>
-<input id="d" type="number">
-
-</div>
-
-<!-- Result -->
-<div class="card">
-
-<h2>Result</h2>
-
-<div id="resA" class="resultBox"></div>
-<div id="resB" class="resultBox"></div>
-<div id="resD" class="resultBox"></div>
-<div id="resAll" class="resultBox"></div>
-<div id="formula"></div>
-
-</div>
-
-<script>
-
-/* SKS TABLE */
-const sksTable={
-"0.63":14,
-"0.80":23,
-"1.00":35,
-"1.50":79,
-"1.60":90,
-"1.75":108,
-"2.00":140,
-"2.50":219,
-"3.00":315
-};
-
-/* Layout */
-function showLayout(){
-
-let layout=document.getElementById("layoutSelect").value;
-
-document.getElementById("imgMR").style.display="none";
-document.getElementById("imgMRL").style.display="none";
-
-if(layout==="mr") document.getElementById("imgMR").style.display="block";
-if(layout==="mrl") document.getElementById("imgMRL").style.display="block";
-
-}
-
-/* Highlight */
-function highlight(id,pass){
-
-let el=document.getElementById(id);
-pass?el.classList.remove("fail"):el.classList.add("fail");
-
-}
-
-/* Result Text */
-function buildText(label,value,req){
-
-let diff=value-req;
-
-if(value>=req){
-return `${label} : ผ่าน ✔ (${value} / ${req} mm)<br>
-<span class="green">เหลือ : +${diff} mm</span>`;
-}else{
-return `${label} : ไม่ผ่าน ✖ (${value} / ${req} mm)<br>
-<span class="red">ขาดไป : ${Math.abs(diff)} mm</span>`;
-}
-
-}
-
-/* Result Box */
-function resultBox(id,pass,html){
-
-let box=document.getElementById(id);
-box.className=pass?"resultBox pass":"resultBox fail";
-box.innerHTML=html;
-
-}
-
-/* Real-time Calculate */
-function calculate(){
-
-let vkn=document.getElementById("vkn").value;
-document.getElementById("sks").value=sksTable[vkn]||"";
-
-let sks=parseFloat(document.getElementById("sks").value)||0;
-let hgp=parseFloat(document.getElementById("hgp").value)||0;
-let hphg=parseFloat(document.getElementById("hphg").value)||0;
-let x=parseFloat(document.getElementById("x").value)||0;
-
-let A=parseFloat(document.getElementById("a").value)||0;
-let B=parseFloat(document.getElementById("b").value)||0;
-let D=parseFloat(document.getElementById("d").value)||0;
-
-let Y=sks+hgp+hphg+x;
-
-let Ay=A-Y;
-let By=B-Y;
-let Dy=D-Y;
-
-let passA=Ay>=1000;
-let passB=By>=300;
-let passD=Dy>=100;
-let overall=passA&&passB&&passD;
-
-highlight("a",passA);
-highlight("b",passB);
-highlight("d",passD);
-
-resultBox("resA",passA,buildText("A-Y",Ay,1000));
-resultBox("resB",passB,buildText("B-Y",By,300));
-resultBox("resD",passD,buildText("D-Y",Dy,100));
-resultBox("resAll",overall,`Overall : ${overall?"ผ่าน ✔":"ไม่ผ่าน ✖"}`);
-
-document.getElementById("formula").innerHTML=
-`<br>สูตร : Y = SKS + HGP + HPHG + X = ${sks}+${hgp}+${hphg}+${x} = ${Y} mm`;
-
-}
-
-/* Event Real-time */
-document.querySelectorAll("input,select").forEach(el=>{
-el.addEventListener("input",calculate);
-});
-
-</script>
-
+        document.getElementById("vkn").addEventListener("change", calculate);
+    </script>
 </body>
 </html>
