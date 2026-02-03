@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EN81 Safety Distance Calculator</title>
+
+<title>Safety Clearance Headroom Calculator</title>
 
 <style>
 
@@ -39,6 +40,13 @@ margin-top:0;
 color:#d32f2f;
 }
 
+.desc{
+font-size:14px;
+color:#444;
+line-height:1.5;
+margin-top:5px;
+}
+
 label{
 font-weight:bold;
 display:block;
@@ -47,7 +55,7 @@ margin-top:12px;
 
 input,select{
 width:100%;
-padding:10px;
+padding:12px;
 font-size:20px;
 border-radius:8px;
 border:2px solid #ff5252;
@@ -68,19 +76,13 @@ font-weight:bold;
 .pass{ color:green; }
 .fail{ color:red; }
 
-footer{
-text-align:center;
-padding:10px;
-color:#777;
-}
-
 </style>
 </head>
 
 <body>
 
 <header>
-EN81 Safety Distance Calculator
+Safety Clearance Headroom Calculator
 </header>
 
 <div class="container">
@@ -88,12 +90,20 @@ EN81 Safety Distance Calculator
 <!-- Layout -->
 <div class="card">
 
-<h3>📐 เลือก Layout</h3>
+<h3>📐 Elevator Layout</h3>
 
-<label>ชนิดลิฟต์</label>
+<div class="desc">
+Select elevator type to display the layout diagram.  
+The diagram illustrates safety clearance areas defined by EN81 standards.  
+Dimension A represents the vertical free space between the car roof standing area and hoistway ceiling.  
+Dimension B represents the clearance above balustrade or equipment installed on the car roof.  
+Dimension D represents guide rail allowance for additional guided travel.
+</div>
+
+<label>Elevator Type</label>
 <select id="layoutSelect" onchange="changeLayout()">
 <option value="mr">Machine Room (MR)</option>
-<option value="mrl">MRL</option>
+<option value="mrl">Machine Room Less (MRL)</option>
 </select>
 
 <img id="layoutImg" class="layout-img" src="image/layout-mr.jpg">
@@ -103,11 +113,16 @@ EN81 Safety Distance Calculator
 <!-- Elevator Info -->
 <div class="card">
 
-<h3>🚀 ข้อมูลลิฟต์</h3>
+<h3>🚀 Elevator Parameters</h3>
 
-<label>ความเร็วลิฟต์ VKN (m/s)</label>
-<select id="VKN" onchange="autoSKS()">
-<option value="">เลือก</option>
+<div class="desc">
+VKN is the rated elevator speed.  
+SKS represents the car jump distance which is calculated according to EN81 formula or standard reference table.
+</div>
+
+<label>Rated Speed VKN (m/s)</label>
+<select id="VKN">
+<option value="">Select Speed</option>
 <option value="0.63">0.63</option>
 <option value="0.80">0.80</option>
 <option value="1.00">1.00</option>
@@ -127,15 +142,20 @@ EN81 Safety Distance Calculator
 <!-- Measured -->
 <div class="card">
 
-<h3>📏 ค่าที่วัดได้</h3>
+<h3>📏 Measured Distances</h3>
 
-<label>A (mm)</label>
+<div class="desc">
+Enter measured safety distances from actual site measurement.  
+These values are used to verify compliance with EN81 headroom clearance requirements.
+</div>
+
+<label>A – Free vertical distance between standing area and hoistway ceiling (mm)</label>
 <input type="number" id="A">
 
-<label>B (mm)</label>
+<label>B – Clearance above equipment or balustrade (mm)</label>
 <input type="number" id="B">
 
-<label>D (mm)</label>
+<label>D – Guide rail extra travel allowance (mm)</label>
 <input type="number" id="D">
 
 </div>
@@ -143,7 +163,13 @@ EN81 Safety Distance Calculator
 <!-- Buffer -->
 <div class="card">
 
-<h3>🧱 Buffer / Stroke</h3>
+<h3>🧱 Buffer and Offset Values</h3>
+
+<div class="desc">
+HGP = Distance between counterweight buffer and impact plate  
+HPHG = Counterweight buffer stroke  
+X = Car offset below top landing
+</div>
 
 <label>HGP (mm)</label>
 <input type="number" id="HGP">
@@ -159,32 +185,28 @@ EN81 Safety Distance Calculator
 <!-- Result -->
 <div class="card">
 
-<h3>📊 ผลคำนวณ</h3>
+<h3>📊 Calculation Result</h3>
 
 <div class="result">Total Y = <span id="Y">0</span> mm</div>
 
 <div class="result">
-A-Y = <span id="AY">0</span> mm
+A − Y = <span id="AY">0</span> mm
 <span id="AYstatus"></span>
 </div>
 
 <div class="result">
-B-Y = <span id="BY">0</span> mm
+B − Y = <span id="BY">0</span> mm
 <span id="BYstatus"></span>
 </div>
 
 <div class="result">
-D-Y = <span id="DY">0</span> mm
+D − Y = <span id="DY">0</span> mm
 <span id="DYstatus"></span>
 </div>
 
 </div>
 
 </div>
-
-<footer>
-EN81 Inspection Tool
-</footer>
 
 <script>
 
@@ -206,30 +228,31 @@ img.src = "image/layout-mrl.jpg";
 
 /* ตาราง SKS */
 const sksTable = {
-0.63:14,
-0.80:23,
-1.00:35,
-1.50:79,
-1.60:90,
-1.75:108,
-2.00:140,
-2.50:219,
-3.00:315
+"0.63":14,
+"0.80":23,
+"1.00":35,
+"1.50":79,
+"1.60":90,
+"1.75":108,
+"2.00":140,
+"2.50":219,
+"3.00":315
 };
 
-/* Auto SKS */
-function autoSKS(){
+/* Auto SKS Fix */
+document.getElementById("VKN").addEventListener("change", function(){
 
-let v = document.getElementById("VKN").value;
+let v = this.value;
 
-if(sksTable[v]){
+if(sksTable[v] !== undefined){
 document.getElementById("SKS").value = sksTable[v];
 }
 
 calculate();
-}
 
-/* คำนวณ */
+});
+
+/* Calculation */
 function calculate(){
 
 let A = getVal("A");
@@ -258,7 +281,7 @@ setStatus("DYstatus",DY,100);
 }
 
 function getVal(id){
-return Number(document.getElementById(id).value);
+return Number(document.getElementById(id).value) || 0;
 }
 
 function setText(id,val){
@@ -270,10 +293,10 @@ function setStatus(id,val,limit){
 let el = document.getElementById(id);
 
 if(val >= limit){
-el.innerHTML = " ✔ ผ่าน";
+el.innerHTML = " ✔ PASS";
 el.className = "pass";
 }else{
-el.innerHTML = " ✖ ไม่ผ่าน";
+el.innerHTML = " ✖ FAIL";
 el.className = "fail";
 }
 
@@ -284,7 +307,6 @@ document.querySelectorAll("input").forEach(input=>{
 input.addEventListener("input",calculate);
 });
 
-/* โหลดรูป default */
 window.onload = changeLayout;
 
 </script>
